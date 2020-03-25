@@ -21,6 +21,11 @@ endif()
 create_target_directory_groups(tests)
 
 target_link_libraries(tests PRIVATE common core video_core)
-target_link_libraries(tests PRIVATE ${PLATFORM_LIBRARIES} catch-single-include nihstro-headers Threads::Threads)
+if (NOT DISABLE_BUNDLED_DEPENDENCIES)
+set (CATCH_DEPENDENCY catch-single-include)
+else (NOT DISABLE_BUNDLED_DEPENDENCIES)
+set (CATCH_DEPENDENCY Catch2::Catch2)
+endif (NOT DISABLE_BUNDLED_DEPENDENCIES)
+target_link_libraries(tests PRIVATE ${PLATFORM_LIBRARIES} ${CATCH_DEPENDENCY} nihstro-headers Threads::Threads)
 
 add_test(NAME tests COMMAND tests)

@@ -28,6 +28,8 @@ option(ENABLE_SCRIPTING "Enables scripting support" OFF)
 
 option(DISABLE_CLANG_TARGET "Disables the Clang format check" ON)
 
+option(DISABLE_BUNDLED_DEPENDENCIES "Disables bundled dependencies" OFF)
+
 if(NOT EXISTS ${CMAKE_SOURCE_DIR}/.git/hooks/pre-commit)
     message(STATUS "Copying pre-commit hook")
     file(COPY hooks/pre-commit
@@ -48,7 +50,9 @@ function(check_submodules_present)
         endif()
     endforeach()
 endfunction()
+if (NOT DISABLE_BUNDLED_DEPENDENCIES)
 check_submodules_present()
+endif ()
 
 configure_file(${CMAKE_SOURCE_DIR}/dist/compatibility_list/compatibility_list.qrc
                ${CMAKE_BINARY_DIR}/dist/compatibility_list/compatibility_list.qrc
@@ -392,6 +396,14 @@ git_branch_name(GIT_BRANCH)
 get_timestamp(BUILD_DATE)
 
 enable_testing()
+
+if (DISABLE_BUNDLED_DEPENDENCIES)
+	find_package(fmt 6.0 CONFIG REQUIRED)
+	message(STATUS "Using shared fmt ${fmt_VERSION}")
+
+	find_package(Catch2 REQUIRED)
+endif (DISABLE_BUNDLED_DEPENDENCIES)
+
 add_subdirectory(externals)
 add_subdirectory(src)
 add_subdirectory(dist/installer)

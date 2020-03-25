@@ -4,6 +4,8 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/CMakeModules)
 include(DownloadExternals)
 include(ExternalProject)
 
+if (NOT DISABLE_BUNDLED_DEPENDENCIES)
+
 # Catch
 add_library(catch-single-include INTERFACE)
 target_include_directories(catch-single-include INTERFACE catch/single_include)
@@ -24,6 +26,8 @@ endif()
 add_subdirectory(fmt)
 add_library(fmt::fmt ALIAS fmt)
 
+endif (NOT DISABLE_BUNDLED_DEPENDENCIES)
+
 # getopt
 if (MSVC)
     add_subdirectory(getopt)
@@ -32,8 +36,10 @@ endif()
 # Glad
 add_subdirectory(glad)
 
+if (NOT DISABLE_BUNDLED_DEPENDENCIES)
 # inih
 add_subdirectory(inih)
+endif (NOT DISABLE_BUNDLED_DEPENDENCIES)
 
 # MicroProfile
 add_library(microprofile INTERFACE)
@@ -54,14 +60,22 @@ target_include_directories(SoundTouch INTERFACE ./soundtouch/include)
 # Xbyak
 if (ARCHITECTURE_x86_64)
     # Defined before "dynarmic" above
-    # add_library(xbyak INTERFACE)
+
+    if (NOT DISABLE_BUNDLED_DEPENDENCIES)
     target_include_directories(xbyak INTERFACE ./xbyak/xbyak)
+    else ()
+    add_library(xbyak INTERFACE)
+    target_include_directories(xbyak INTERFACE /usr/include/xbyak)
+    endif ()
     target_compile_definitions(xbyak INTERFACE XBYAK_NO_OP_NAMES)
 endif()
 
+
+if (NOT DISABLE_BUNDLED_DEPENDENCIES)
 # ENet
 add_subdirectory(enet)
 target_include_directories(enet INTERFACE ./enet/include)
+endif ()
 
 # Cubeb
 if (ENABLE_CUBEB)
